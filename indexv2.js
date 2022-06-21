@@ -1,18 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
+
 const app = express();
-
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
-
 
 app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 
 // Connect to MongoDB
-
 mongoose
   .connect(
     'mongodb://mongo:27017/dockernodemongo',
@@ -20,7 +15,6 @@ mongoose
   )
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
-//--------------------------------
 
 const Item = require('./models/Item');
 
@@ -30,17 +24,12 @@ app.get('/', (req, res) => {
     .catch(err => res.status(404).json({ msg: 'No items found' }));
 });
 
-app.post('/', jsonParser, (req, res) => {
-	console.log(JSON.stringify(req.body.name));
+app.post('/item/add', (req, res) => {
+  const newItem = new Item({
+    name: req.body.name
+  });
 
-	const newItem = new Item({
-		name: req.body.name,
-		password: req.body.password,
-		webpage: req.body.webpage
-	});
-	newItem.save().then(item => res.redirect('/'));
-
-	res.send("Data has been saved.");
+  newItem.save().then(item => res.redirect('/'));
 });
 
 const port = 3000;
